@@ -1,0 +1,126 @@
+{
+  "name": "Support Email Automation - Error Handler v1.0",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "740301ca-9e25-4ca4-8bce-3287a0ea64b9",
+      "name": "E1 - Error Trigger",
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Redacted alert: workflow/node/error class only. No email content.\nconst e = $input.first().json;\nconst cfg = $('E0 - Config').first().json;\nconst msg = String((e.execution && e.execution.error && e.execution.error.message) || 'unknown error').slice(0, 300);\nconst body = [\n  'An unhandled failure occurred in the support email automation. Some messages may be stuck in PROCESSING; see the recovery steps in the handover notes.',\n  '',\n  'Workflow: ' + (e.workflow && e.workflow.name),\n  'Execution ID: ' + (e.execution && e.execution.id),\n  'Failed node: ' + (e.execution && e.execution.lastNodeExecuted),\n  'Error: ' + msg,\n  'Execution URL: ' + (e.execution && e.execution.url),\n  'Time: ' + new Date().toISOString(),\n].join('\\n');\nreturn [{ json: { to: cfg.ownerEmail, subject: '[Support Automation ERROR] ' + (e.workflow && e.workflow.name), body } }];\n"
+      },
+      "id": "7833fa82-24a9-4813-925f-6e70cb9c2ec6",
+      "name": "E2 - Build Alert",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eaa49b8c-4022-507f-b16f-3675f8e0afcc",
+              "name": "ownerEmail",
+              "value": "automation-owner@example.com",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "0139706e-6f6d-4937-a956-2b393a9dfff0",
+      "name": "E0 - Config",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $json.to }}",
+        "subject": "={{ $json.subject }}",
+        "emailType": "text",
+        "message": "={{ $json.body }}",
+        "options": {}
+      },
+      "id": "5bc4b671-dccc-4761-ba8a-61da3b178622",
+      "name": "E3 - Notify Owner",
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        720,
+        0
+      ],
+      "webhookId": "2168dd7f-ec0b-46c3-bcc1-8a18df4dd7c2",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "swygInKZ1dZHrJfC",
+          "name": "Gmail account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "E1 - Error Trigger": {
+      "main": [
+        [
+          {
+            "node": "E0 - Config",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "E0 - Config": {
+      "main": [
+        [
+          {
+            "node": "E2 - Build Alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "E2 - Build Alert": {
+      "main": [
+        [
+          {
+            "node": "E3 - Notify Owner",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "744bb034-4d7b-4409-9973-5128c36600d0",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9d87fdccafd661d54f6f1235254d0e41abaa5039cec485359fcd9f6dc08153dd"
+  },
+  "nodeGroups": [],
+  "id": "tWoykHFdMMHNsNvk",
+  "tags": []
+}

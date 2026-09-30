@@ -1,0 +1,23 @@
+# Secrets and credentials - never commit
+.env
+.env.*
+*.pem
+*.key
+client_secret*.json
+*service-account*.json
+credentials*.json
+token*.json
+
+# Live n8n exports contain the real mailbox / Pinecone host; commit only after review
+workflow/workflows/exported/
+
+# Local tooling
+__pycache__/
+node_modules/
+.claude/
+
+# Client source documents (folder is named "Ignore"); remove this line if you do want them in the repo
+Ignore/
+
+# Test Cases
+tests/
